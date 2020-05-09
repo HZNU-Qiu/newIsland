@@ -1,0 +1,39 @@
+{
+  "name": "newisland",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.19.2",
+    "basic-auth": "^2.0.1",
+    "bcryptjs": "^2.4.3",
+    "jsonwebtoken": "^8.5.1",
+    "koa": "^2.11.0",
+    "koa-bodyparser": "^4.2.1",
+    "koa-router": "^8.0.8",
+    "koa-static": "^5.0.0",
+    "lodash": "^4.17.15",
+    "module-alias": "^2.2.0",
+    "mysql2": "^2.1.0",
+    "npm-check": "^5.9.2",
+    "request": "^2.88.2",
+    "require-all": "^3.0.0",
+    "require-directory": "^2.1.1",
+    "sequelize": "^5.21.5",
+    "validator": "^11.0.0"
+  },
+  "_moduleAliases": {
+    "@root": ".",
+    "@model": "app/model",
+    "@core": "core",
+    "@middlewares": "middlewares",
+    "@validator": "app/validators/validator.js",
+    "@services": "app/services",
+    "@lib": "app/lib"
+  }
+}
