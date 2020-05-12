@@ -5,6 +5,9 @@ const {
   LibraryInfoValidator,
   AddAdminValidator,
   DesignateValidator,
+  BanLibraryValidator,
+  ActivateLibraryValidator,
+
 } = require('../../validators/validator')
 const { Library } = require('../../models/library')
 const { success } = require('../../lib/helper')
@@ -40,6 +43,26 @@ router.post('/designate', async ctx => {
   const libraryId = v.get('body.libraryId')
   console.log(userId, libraryId)
   await Library.designate(userId, libraryId)
+  success('ok')
+})
+
+/**
+ * 激活题库
+ */
+router.get('/activate/:id', async ctx => {
+  const v = await new ActivateLibraryValidator().validate(ctx)
+  const id = v.get('path.id')
+  await Library.activate(id)
+  success('ok')
+})
+
+/**
+ * 禁用题库
+ */
+router.get('/ban/:id', async ctx => {
+  const v = await new BanLibraryValidator().validate(ctx)
+  const id = v.get('path.id')
+  await Library.ban(id)
   success('ok')
 })
 

@@ -64,11 +64,24 @@ class Forbidden extends HttpException {
 	}
 }
 
+/**
+ * 已拥有题库报错
+ */
+class HasOwnedLibrary extends HttpException {
+	constructor(message, errorCode) {
+    super()
+    this.code = 400
+    this.message = message || '你已经拥有该题库'
+    this.errorCode = errorCode || 10000
+  }
+}
+
 module.exports = {
   HttpException,
   ParameterException,
   Success,
   NotFound,
   Forbidden,
-  AuthFailed,
+	AuthFailed,
+	HasOwnedLibrary,
 }

@@ -1,5 +1,6 @@
 const { db } = require('../../core/db')
 const { Sequelize, Model } = require('sequelize')
+const { HasOwnedLibrary } = require('../../core/http-exception')
 
 class UserLibrary extends Model {
   /**
@@ -15,7 +16,7 @@ class UserLibrary extends Model {
       }
     })
     if (userLibrary) {
-      throw new Error('您已经拥有该题库了')
+      throw new HasOwnedLibrary('您已经拥有该题库了')
     }
     let library = await Library.findByPk(library_id)
     db.transaction(async t => {

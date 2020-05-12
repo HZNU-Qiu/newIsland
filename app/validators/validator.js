@@ -418,7 +418,7 @@ class IsLibraryExistValidator extends PositiveIntegerValidator {
     if (!id)
       id = vals.path.id
     const library = await Library.findByPk(id)
-    if (!library)  
+    if (!library)
       throw new Error('题库不存在')
   }
 }
@@ -596,6 +596,70 @@ class ModifyExamValidator extends ExamValidator {
   }
 }
 
+/**
+ * 禁用题库校验器
+ */
+class BanLibraryValidator extends PositiveIntegerValidator {
+  constructor() {
+    super()
+  }
+  async validateHasExam(vals) {
+    const id = vals.path.id
+    let sql = `
+    SELECT COUNT(*) AS num FROM exam e
+    LEFT JOIN paper p ON e.paper_id = p.id
+    WHERE p.library_id = ${id}
+    `
+    const num = await db.query(sql,
+      { raw: true }).then(obj => {
+        return obj[0][0].num
+      })
+    if (num !== 0) {
+      throw new Error('该题库有考试不能禁用')
+    }
+  }
+}
+
+/**
+ * 题库是否可用校验器
+ */
+class IsLibraryAccessibleValidator extends PositiveIntegerValidator {
+  constructor() {
+    super()
+  }
+  async validateLibraryAccessibilty(vals) {
+    const id = vals.path.id
+    const library = await Library.findOne({
+      where: {
+        id: id,
+        status: 1
+      }
+    })
+    if (!library) {
+      throw new Error('题库不可用')
+    }
+  }
+}
+
+/**
+ * 题库激活校验器
+ */
+class ActivateLibraryValidator extends PositiveIntegerValidator {
+  constructor() {
+    super()
+  }
+  async validateLibraryHasAdmin(vals) {
+    const id = vals.path.id
+    const library = await Library.findByPk(id)
+    if (!library) {
+      throw new Error('题库不存在')
+    } else if (library.status) {
+      throw new Error('题库已经激活了')
+    } else if (!library.admin_id) {
+      throw new Error('题库还有没分配管理员，不能激活')
+    }
+  }
+}
 
 module.exports = {
   PositiveIntegerValidator,
@@ -619,5 +683,8 @@ module.exports = {
   AssemblePaperValidator,
   AddExamValidator,
   ModifyExamValidator,
+  BanLibraryValidator,
+  IsLibraryAccessibleValidator,
+  ActivateLibraryValidator,
 
 }
