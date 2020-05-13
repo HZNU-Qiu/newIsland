@@ -41,7 +41,6 @@ router.post('/designate', async ctx => {
   const v = await new AddAdminValidator().validate(ctx)
   const userId = v.get('body.userId')
   const libraryId = v.get('body.libraryId')
-  console.log(userId, libraryId)
   await Library.designate(userId, libraryId)
   success('ok')
 })

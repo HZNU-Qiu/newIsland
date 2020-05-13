@@ -661,6 +661,22 @@ class ActivateLibraryValidator extends PositiveIntegerValidator {
   }
 }
 
+/**
+ * 题目存在校验器
+ */
+class ExerciseExistenceValidator extends PositiveIntegerValidator {
+  constructor() {
+    super()
+  }
+  async validateExerciseExistence(vals) {
+    const id = vals.path.id
+    const exercise = await Exercise.findByPk(id)
+    if (!exercise) {
+      throw new Error('题目不存在')
+    }
+  }
+}
+
 module.exports = {
   PositiveIntegerValidator,
   RegisterValidator,
@@ -686,5 +702,6 @@ module.exports = {
   BanLibraryValidator,
   IsLibraryAccessibleValidator,
   ActivateLibraryValidator,
-
+  ExerciseExistenceValidator,
+  
 }
