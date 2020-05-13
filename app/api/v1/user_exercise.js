@@ -26,4 +26,12 @@ router.get('/', new Auth(4).m, async ctx => {
   success('ok', data)
 })
 
+router.get('/delete/:id', new Auth(4).m, async ctx => {
+  const v = await new PositiveIntegerValidator().validate(ctx)
+  const userId = ctx.auth.uid
+  const exerciseId = v.get('path.id')
+  await UserExercise.desert(userId, exerciseId)
+  success('ok')
+})
+
 module.exports = router

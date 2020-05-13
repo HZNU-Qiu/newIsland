@@ -32,6 +32,20 @@ class UserExercise extends Model {
     return data[0]
   }
 
+  /**
+   * 移除错题集中练习题
+   * @param userId 用户id
+   * @param exerciseId 练习题id
+   */
+  static async desert(userId, exerciseId) {
+    return UserExercise.destroy({
+      where: {
+        user_id: userId,
+        exercise_id: exerciseId
+      },force: true
+    })
+  }
+
 }
 
 UserExercise.init({
