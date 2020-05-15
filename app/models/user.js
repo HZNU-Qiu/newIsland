@@ -1,6 +1,7 @@
 const { db } = require('../../core/db')
 const { Sequelize, Model } = require('sequelize')
 const bcryptjs = require('bcryptjs')
+const { Forbidden } = require('../../middlewares/exception')
 
 class User extends Model {
   /**
@@ -18,11 +19,11 @@ class User extends Model {
    */
   static async signIn(account, password) {
     const user = await User.findOne({
-      where: { account: account }
+      where: { account: account, status: 1 }
     })
     // 如果用户不存在
     if (!user) {
-      throw new global.errs.AuthFailed('账号不存在')
+      throw new global.errs.AuthFailed('账号不存在,或被禁用')
     }
     const correct = bcryptjs.compareSync(password, user.password)
     if (!correct) {
@@ -59,8 +60,25 @@ class User extends Model {
    * @param id 用户id
    */
   static async banUser(id) {
+    if (id === 1) {
+      throw new global.errs.Forbidden('您无权限禁用')
+    }
     await User.update({
       status: 0
+    }, {
+      where: {
+        id: id
+      }
+    })
+  }
+
+  /**
+   * 启用普通用户账号
+   * @param id 用户id
+   */
+  static async activateUser(id) {
+    await User.update({
+      status: 1
     }, {
       where: {
         id: id
@@ -80,6 +98,14 @@ class User extends Model {
         id: info.id
       }
     })
+  }
+
+  /**
+   * 获取个人信息
+   * @param id 用户id
+   */
+  static async detail(id) {
+    return await User.findByPk(id)
   }
 
 }

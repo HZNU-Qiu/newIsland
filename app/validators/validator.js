@@ -241,10 +241,10 @@ class LibraryInfoValidator extends LinValidator {
     super()
     this.name = [
       new Rule('isLength', '题库名称不能为空且不能多余16个字符', { min: 1, max: 16 })
-    ],
-      this.tag_id = [
-        new Rule('isInt', '类型必须为整数且不能为空', { min: 1 })
-      ]
+    ]
+    this.tag_id = [
+      new Rule('isInt', '类型必须为整数且不能为空', { min: 1 })
+    ]
   }
   async validateLibraryName(vals) {
     const name = vals.body.name
@@ -677,6 +677,33 @@ class ExerciseExistenceValidator extends PositiveIntegerValidator {
   }
 }
 
+/**
+ * 题库编辑校验器
+ */
+class ModifyLibraryValidator extends PositiveIntegerValidator {
+  constructor() {
+    super()
+    this.name = [
+      new Rule('isLength', '题库名称不能为空且不能多余16个字符', { min: 1, max: 16 })
+    ]
+    this.tag_id = [
+      new Rule('isInt', '类型必须为整数且不能为空', { min: 1 })
+    ]
+  }
+  async validateNameRepeat(vals) {
+    const id = vals.body.id
+    const name = vals.body.name
+    const library = await Library.findOne({
+      where: {
+        name: name
+      }
+    })
+    if (library && library.id !== id) {
+      throw new Error('名称冲突不能修改')
+    }
+  }
+}
+
 module.exports = {
   PositiveIntegerValidator,
   RegisterValidator,
@@ -703,5 +730,6 @@ module.exports = {
   IsLibraryAccessibleValidator,
   ActivateLibraryValidator,
   ExerciseExistenceValidator,
-  
+  ModifyLibraryValidator,
+
 }

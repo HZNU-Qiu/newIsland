@@ -7,10 +7,12 @@ const {
   DesignateValidator,
   BanLibraryValidator,
   ActivateLibraryValidator,
+  ModifyLibraryValidator,
 
 } = require('../../validators/validator')
 const { Library } = require('../../models/library')
 const { success } = require('../../lib/helper')
+const { Auth } = require('../../../middlewares/auth')
 
 /**
  * 新增题库接口
@@ -62,6 +64,16 @@ router.get('/ban/:id', async ctx => {
   const v = await new BanLibraryValidator().validate(ctx)
   const id = v.get('path.id')
   await Library.ban(id)
+  success('ok')
+})
+
+/**
+ * 编辑题库
+ */
+router.post('/modify',new Auth(16).m ,async ctx => {
+  const v = await new ModifyLibraryValidator().validate(ctx)
+  const library = v.get('body')
+  await Library.modify(library)
   success('ok')
 })
 

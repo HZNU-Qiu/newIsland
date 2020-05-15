@@ -6,6 +6,7 @@ const { RegisterValidator,
   UserInfoValidator } = require('../../validators/validator')
 const { User } = require('../../models/user')
 const { success } = require('../../lib/helper')
+const { Auth } = require('../../../middlewares/auth')
 
 /**
  * 用户注册接口
@@ -22,7 +23,7 @@ router.post('/register', async (ctx, next) => {
     avatar: '/default.jpg',
     status: 1
   }
-  await User. add(user)
+  await User.add(user)
   success()
 })
 
@@ -46,7 +47,7 @@ router.post('/distribute', async (ctx, next) => {
 /**
  * 用户分页列表接口
  */
-router.get('/list', async ctx => {
+router.get('/list', new Auth(32).m, async ctx => {
   let { currentPage = 1, type = 4 } = ctx.request.query
   let offset = (currentPage - 1) * 15
   const userList = await User.listByPage(offset, type)
@@ -56,9 +57,18 @@ router.get('/list', async ctx => {
 /**
  * 普通用户禁用接口
  */
-router.get('/ban/:id', async ctx => {
+router.get('/ban/:id', new Auth(32).m, async ctx => {
   const v = await new PositiveIntegerValidator().validate(ctx)
   await User.banUser(v.get('path.id'))
+  success('ok')
+})
+
+/**
+ * 用户激活接口
+ */
+router.get('/activate/:id', new Auth(32).m, async ctx => {
+  const v = await new PositiveIntegerValidator().validate(ctx)
+  await User.activateUser(v.get('path.id'))
   success('ok')
 })
 
@@ -74,6 +84,15 @@ router.post('/modify', async ctx => {
   }
   await User.modify(info)
   return success('ok')
+})
+
+/**
+ * 用户细节展示
+ */
+router.get('/detail', new Auth(4).m, async ctx => {
+  const id = ctx.auth.uid
+  const data = await User.detail(id)
+  success('ok', data)
 })
 
 module.exports = router
