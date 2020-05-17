@@ -7,6 +7,7 @@ const { Chapter } = require('../models/chapter')
 const { Exercise } = require('../models/exercise')
 const { Paper } = require('../models/paper')
 const { Exam } = require('../models/exam')
+const { UserExercise } = require('../models/user_exercise')
 
 /**
  * 用户注册校验器
@@ -704,6 +705,28 @@ class ModifyLibraryValidator extends PositiveIntegerValidator {
   }
 }
 
+/**
+ * 修改密码校验
+ */
+class ResetPasswordValidator extends LinValidator {
+  constructor() {
+    super()
+    this.password1 = [
+      new Rule('isLength', '密码长度为6~18个字符', { min: 6, max: 32 }),
+      new Rule('matches', '密码至少1个大写字母，1个小写字母和一个数字', /^[\w_-]{6,16}$/)
+    ]
+    // 这里是相同的规则
+    this.password2 = this.password1
+  }
+  validatePassword(vals) {
+    const pwd1 = vals.body.password1
+    const pwd2 = vals.body.password2
+    if (pwd1 !== pwd2) {
+      throw new Error('两个密码必须相同')
+    }
+  }
+}
+
 module.exports = {
   PositiveIntegerValidator,
   RegisterValidator,
@@ -731,5 +754,6 @@ module.exports = {
   ActivateLibraryValidator,
   ExerciseExistenceValidator,
   ModifyLibraryValidator,
+  ResetPasswordValidator,
 
 }

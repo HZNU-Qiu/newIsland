@@ -17,7 +17,9 @@ const { Auth } = require('../../../middlewares/auth')
 router.post('/', new Auth(16).m, async ctx => {
   const v = await new QueryPaperValidator().validate(ctx)
   const params = v.get('body')
-  const data = await Paper.listByPage(params)
+  let data = {}
+  data.rows = await Paper.listByPage(params)
+  data.count = data.rows.length
   success('ok', data)
 })
 

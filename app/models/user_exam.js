@@ -11,6 +11,28 @@ class UserExam extends Model {
       ...params
     })
   }
+
+  /**
+   * 展示用户的考试分页，一页10个
+   * @param currentPage 当前页数
+   * @param userId 用户id
+   * @param status 考试状态
+   */
+  static async listUserExams(currentPage, userId, status) {
+    const offset = (currentPage - 1) * 10
+    if (parseInt(status) !== 3)
+      status = 0
+    let sql = `
+    SELECT e.id,e.name,e.start,e.end,e.status,u.grade 
+    FROM exam e 
+    LEFT JOIN user_exam u ON e.id = u.exam_id
+    WHERE u.user_id = ${userId} AND e.status = ${status}
+    LIMIT 10 OFFSET ${offset}
+    `
+    const data = await db.query(sql, { raw: true })
+    return data[0]
+  }
+
 }
 
 UserExam.init({

@@ -8,6 +8,7 @@ const {
 } = require('../../validators/validator')
 const { Exercise } = require('../../models/exercise')
 const { success } = require('../../lib/helper')
+const { Auth } = require('../../../middlewares/auth')
 
 /**
  * 新增习题
@@ -58,6 +59,16 @@ router.post('/listAll', async ctx => {
   const v = await new IsLibraryExistValidator().validate(ctx)
   const params = v.get('body')
   const data = await Exercise.listAll(params)
+  success('ok', data)
+})
+
+/**
+ * 用户模拟考试
+ */
+router.get('/simulate/:id', new Auth(4).m, async ctx => {
+  const v = await new PositiveIntegerValidator().validate(ctx)
+  const id = v.get('path.id')
+  const data = await Exercise.simulateExam(id)
   success('ok', data)
 })
 

@@ -108,6 +108,19 @@ class User extends Model {
     return await User.findByPk(id)
   }
 
+  /**
+   * 重置用户密码
+   */
+  static async resetPassword(param) {
+    return await User.update({
+      ...param
+    }, {
+      where: {
+        id: param.id
+      }
+    })
+  }
+
 }
 
 User.init({

@@ -39,6 +39,31 @@ class Chapter extends Model {
     return data
   }
 
+  /**
+   * 列出用户题库章节
+   * @param userId 用户id
+   * @param libraryId 题库id
+   */
+  static async listUserChapters(userId, libraryId) {
+    let chapter = await db.query(`SELECT * FROM chapter WHERE library_id=${libraryId}`, { raw: true })
+    chapter = chapter[0]
+    let userEx = await db.query(`SELECT e.id,e.chapter
+    FROM user_exercise u 
+    LEFT JOIN exercise e ON u.exercise_id=e.id 
+    LEFT JOIN chapter c ON e.chapter=c.id 
+    WHERE c.library_id=${libraryId} AND u.user_id=${userId} AND u.type=2`, { raw: true })
+    userEx = userEx[0]
+    chapter.map(item => {
+      item.done = 0
+      userEx.map(item1 => {
+        if (item1.chapter === item.id) {
+          item.done++
+        }
+      })
+    })
+    return chapter
+  }
+
 }
 
 Chapter.init({

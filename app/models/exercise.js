@@ -117,6 +117,24 @@ class Exercise extends Model {
     return await list
   }
 
+  /**
+   * 模拟考试
+   * @param paperId 试卷ID
+   */
+  static async simulateExam(paperId) {
+    let data = {}
+    const { Paper } = require('./paper')
+    let paper = await Paper.findByPk(paperId)
+    let sql = `
+    SELECT * FROM exercise WHERE id in (${paper.problem_list})
+    `
+    let ex = await db.query(sql, { raw: true })
+    data.rows = ex[0]
+    data.grade = paper.score
+    data.count = ex[0].length
+    return data
+  }
+
 }
 
 Exercise.init({

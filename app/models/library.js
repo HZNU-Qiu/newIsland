@@ -89,8 +89,7 @@ class Library extends Model {
       LIMIT 20 OFFSET ${offset}
       `
     }
-    let libraries = await db.query(
-      sql, { raw: true })
+    let libraries = await db.query(sql, { raw: true })
     return libraries[0]
   }
 

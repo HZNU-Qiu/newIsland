@@ -33,7 +33,10 @@ router.get('/', async ctx => {
   const { currentPage = 1, tag_id = 0 } = ctx.request.query
   let offset = (currentPage - 1) * 20
   const libraries = await Library.listByPage(offset, parseInt(tag_id))
-  success('ok', libraries)
+  let data = {}
+  data.count = libraries.length
+  data.rows = libraries
+  success('ok', data)
 })
 
 /**

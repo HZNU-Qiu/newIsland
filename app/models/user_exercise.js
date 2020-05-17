@@ -25,7 +25,7 @@ class UserExercise extends Model {
     SELECT e.* FROM exercise e LEFT JOIN user_exercise u
     ON e.id = u.exercise_id
     LEFT JOIN chapter c ON e.chapter = c.id
-    WHERE c.library_id = ${libraryId} AND u.user_id = ${userId}
+    WHERE c.library_id = ${libraryId} AND u.user_id = ${userId} AND u.type = 1
     LIMIT 10 OFFSET ${offset}
     `
     const data = await db.query(sql, { raw: true })
@@ -41,9 +41,59 @@ class UserExercise extends Model {
     return UserExercise.destroy({
       where: {
         user_id: userId,
-        exercise_id: exerciseId
-      },force: true
+        exercise_id: exerciseId,
+        type: 1
+      }, force: true
     })
+  }
+
+  /**
+   * 保存已作答记录
+   * @param list 题目数组
+   * @param userId 用户id
+   */
+  static async saveRecord(list, userId) {
+    let has = await UserExercise.findAll({
+      where: {
+        user_id: userId,
+        type: 2
+      }
+    })
+
+    let data = []
+    var flag = 1
+    list.map(item => {
+      has.map(item1 => {
+        if (item === item1.exercise_id) {
+          flag = 0
+          return
+        }
+      })
+      if (flag) {
+        data.push({ exercise_id: item, user_id: userId, type: 2 })
+      }
+      flag = 1
+    })
+    return await UserExercise.bulkCreate(data, { returning: true })
+  }
+
+  /**
+   * 分页展示用户历史刷题记录
+   * @param userId 用户id
+   * @param libraryId 题库id
+   * @param currentPage 当前页码
+   */
+  static async history(userId, libraryId, currentPage) {
+    let offset = (currentPage - 1) * 10
+    const exs = await db.query(`SELECT e.* FROM exercise e 
+    LEFT JOIN user_exercise u ON e.id=u.exercise_id
+    LEFT JOIN chapter c ON c.id = e.chapter
+    WHERE u.user_id=${userId} AND c.library_id=${libraryId}
+    LIMIT 10 OFFSET ${offset}`, { raw: true })
+    let data = {}
+    data.rows = exs[0]
+    data.count = exs[0].length
+    return data
   }
 
 }
@@ -58,7 +108,12 @@ UserExercise.init({
   // 用户id
   user_id: Sequelize.INTEGER,
   // 题目id
-  exercise_id: Sequelize.INTEGER
+  exercise_id: Sequelize.INTEGER,
+  // 类型 1-收藏 2-刷题记录(已做)
+  type: {
+    type: Sequelize.INTEGER,
+    defaultValue: 2
+  }
 }, {
   sequelize: db,
   tableName: 'user_exercise'

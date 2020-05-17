@@ -3,7 +3,10 @@ const router = new Router({ prefix: '/v1/user' })
 const { RegisterValidator,
   PositiveIntegerValidator,
   AccountDesignateValidator,
-  UserInfoValidator } = require('../../validators/validator')
+  UserInfoValidator,
+  ResetPasswordValidator,
+
+} = require('../../validators/validator')
 const { User } = require('../../models/user')
 const { success } = require('../../lib/helper')
 const { Auth } = require('../../../middlewares/auth')
@@ -79,6 +82,7 @@ router.post('/modify', async ctx => {
   const v = await new UserInfoValidator().validate(ctx)
   const info = {
     id: v.get('body.id'),
+    username: v.get('body.username'),
     email: v.get('body.email'),
     sex: v.get('body.sex'),
   }
@@ -93,6 +97,19 @@ router.get('/detail', new Auth(4).m, async ctx => {
   const id = ctx.auth.uid
   const data = await User.detail(id)
   success('ok', data)
+})
+
+/**
+ * 用户修改密码
+ */
+router.post('/reset', new Auth(4).m, async ctx => {
+  const v = await new ResetPasswordValidator().validate(ctx)
+  const id = ctx.auth.uid
+  let param = {}
+  param.id = id
+  param.password = v.get('body.password1')
+  await User.resetPassword(param)
+  success('ok')
 })
 
 module.exports = router

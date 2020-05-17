@@ -4,6 +4,7 @@ const { PositiveIntegerValidator,
   AddChapterValidator } = require('../../validators/validator')
 const { Chapter } = require('../../models/chapter')
 const { success } = require('../../lib/helper')
+const { Auth } = require('../../../middlewares/auth')
 
 /**
  * 新增章节接口
@@ -40,7 +41,18 @@ router.get('/:id', async ctx => {
  */
 router.get('/destroy/:id', async ctx => {
   const v = await new PositiveIntegerValidator().validate(ctx)
-  
+
+})
+
+/**
+ * 用户查看进入题库返回章节
+ */
+router.get('/enter/:id', new Auth(4).m, async ctx => {
+  const v = await new PositiveIntegerValidator().validate(ctx)
+  const userId = ctx.auth.uid
+  const libraryId = v.get('path.id')
+  const data = await Chapter.listUserChapters(userId, libraryId)
+  success('ok', data)
 })
 
 module.exports = router

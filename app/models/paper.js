@@ -26,7 +26,6 @@ class Paper extends Model {
    * @param params 参数集
    */
   static async addPaperModel(params) {
-    console.log(params)
     return await Paper.create({
       ...params
     })
