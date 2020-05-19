@@ -67,28 +67,24 @@ class Library extends Model {
   /**
    * 展示题库(分页) 一页20个数据
    */
-  static async listByPage(offset, tagId) {
-    let sql = ''
-    if (!tagId) {
-      sql = `
-      SELECT l.*,u.username,t.name as tagName
-      FROM library l LEFT JOIN user u
-      ON l.admin_id = u.id
-      LEFT JOIN tags t
-      ON l.tag_id = t.id
-      LIMIT 20 OFFSET ${offset}
-      `
-    } else {
-      sql = `
-      SELECT l.*,u.username,t.name as tagName
-      FROM library l LEFT JOIN user u
-      ON l.admin_id = u.id
-      LEFT JOIN tags t
-      ON l.tag_id = t.id
-      WHERE l.tag_id = ${tagId}
-      LIMIT 20 OFFSET ${offset}
-      `
+  static async listByPage(offset, tagId, name) {
+    let sql = `
+    SELECT l.*,u.username,t.name as tagName
+    FROM library l LEFT JOIN user u
+    ON l.admin_id = u.id
+    LEFT JOIN tags t
+    ON l.tag_id = t.id 
+    `
+    if (tagId && !name) {
+      sql += `WHERE l.tag_id = ${tagId} `
     }
+    if (!tagId && name) {
+      sql += `WHERE l.name LIKE '%${name}%' `
+    }
+    if (tagId && name) {
+      sql += `WHERE l.tag_id = ${tagId} AND l.name LIKE '%${name}%' `
+    }
+    sql += `LIMIT 20 OFFSET ${offset}`
     let libraries = await db.query(sql, { raw: true })
     return libraries[0]
   }

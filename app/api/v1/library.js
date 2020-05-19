@@ -28,11 +28,12 @@ router.post('/add', async ctx => {
  * 显示题库信息 (分页)一页20个数据
  * @param currentPage 当前页码
  * @param tag_id 所属类型
+ * @param name 题库名称
  */
 router.get('/', async ctx => {
-  const { currentPage = 1, tag_id = 0 } = ctx.request.query
+  const { currentPage = 1, tag_id = 0, name = null } = ctx.request.query
   let offset = (currentPage - 1) * 20
-  const libraries = await Library.listByPage(offset, parseInt(tag_id))
+  const libraries = await Library.listByPage(offset, parseInt(tag_id), name)
   let data = {}
   data.count = libraries.length
   data.rows = libraries

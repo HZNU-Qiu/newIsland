@@ -35,23 +35,26 @@ class User extends Model {
   /**
    * 用户列表(分页) 默认一页15条记录
    * @param offset 跳过多少数据
+   * @param type 用户类型
+   * @param username 用户名
+   * @param status 用户状态
    */
-  static async listByPage(offset, type) {
-    const user = await User.findAndCountAll({
-      attributes: {
-        exclude: ['password', 'openid']
-      },
-      where: {
-        type: type
-      },
-      offset: offset,
-      limit: 15
-    }).then(res => {
-      let result = {}
-      result.list = res.rows
-      result.total = res.count
-      return result
-    })
+  static async listByPage(offset, type, username, status) {
+    let sql = `
+    SELECT id,username,account,email,sex,avatar,openid,type,status FROM user
+    WHERE type=${type} 
+    `
+    if (username) {
+      sql += `AND username LIKE '%${username}%' `
+    }
+    if (status) {
+      sql += `AND status=${status} `
+    }
+    sql += `LIMIT 15 OFFSET ${offset}`
+    const data = await db.query(sql, { raw: true })
+    let user = {}
+    user.rows = data[0]
+    user.count = data[0].length
     return user
   }
 
@@ -119,6 +122,22 @@ class User extends Model {
         id: param.id
       }
     })
+  }
+
+  /**
+   * 获取未分配题库管理员
+   */
+  static async getUnassignedAdmin() {
+    let sql = `
+    SELECT u.id,u.username 
+    FROM user u 
+    LEFT JOIN library l ON u.id=l.admin_id 
+    WHERE l.admin_id is NULL 
+    AND type=16 
+    AND u.status=1 
+    `
+    const data = await db.query(sql, { raw: true })
+    return data[0]
   }
 
 }

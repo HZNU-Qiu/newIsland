@@ -48,12 +48,12 @@ router.post('/distribute', async (ctx, next) => {
 })
 
 /**
- * 用户分页列表接口
+ * 管理员用户分页列表接口
  */
 router.get('/list', new Auth(32).m, async ctx => {
-  let { currentPage = 1, type = 4 } = ctx.request.query
+  let { currentPage = 1, type = 4, username = null, status = 1 } = ctx.request.query
   let offset = (currentPage - 1) * 15
-  const userList = await User.listByPage(offset, type)
+  const userList = await User.listByPage(offset, type, username, status)
   success('ok', userList)
 })
 
@@ -110,6 +110,14 @@ router.post('/reset', new Auth(4).m, async ctx => {
   param.password = v.get('body.password1')
   await User.resetPassword(param)
   success('ok')
+})
+
+/**
+ * 获取未分配题库管理员
+ */
+router.get('/preassign', new Auth(32).m, async ctx => {
+  const data = await User.getUnassignedAdmin()
+  success('ok', data)
 })
 
 module.exports = router
