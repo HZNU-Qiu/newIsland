@@ -8,6 +8,7 @@ const { Exercise } = require('../models/exercise')
 const { Paper } = require('../models/paper')
 const { Exam } = require('../models/exam')
 const { UserExercise } = require('../models/user_exercise')
+const { Announcement } = require('../models/announcement')
 
 /**
  * 用户注册校验器
@@ -727,6 +728,149 @@ class ResetPasswordValidator extends LinValidator {
   }
 }
 
+
+/*
+通知内容非空校验器
+*/
+
+class AnnouncementNotnullValidator extends LinValidator {
+    constructor() {
+        super()
+        this.content = [
+            new Rule('isLength', '通知信息不得为空', { min: 1 })
+        ]
+        this.from = [
+            new Rule('isInt', '类型必须为整数且不能为空', { min: 0 }),
+        ]
+        this.to = [
+            new Rule('isInt', '收件人类型必须为整数且不能为空', { min: 0 }),
+        ]
+    }
+    async validateToExits(vals) {
+        const toId = vals.body.to
+        const flag = await User.findOne({
+            where: { id: toId }
+        })
+        if (!flag && toId != 0) {
+            throw new Error('用户不存在')
+        }
+    }
+}
+
+/*
+通知内容发送校验器
+*/
+
+class SendAnnouncementValidator extends LinValidator {
+    constructor() {
+        super()
+    }
+    async validateAnnocementExits(vals) {
+        const ID = vals.body.id
+        const flag = await Announcement.findOne({
+            where: { id: ID }
+        })
+        if (!flag) {
+            throw new Error('通知不存在')
+        }
+    }
+}
+
+/*
+通知内容编辑校验器
+*/
+
+class ModifyAnnouncementValidator extends LinValidator {
+    constructor() {
+        super()
+        this.id = [
+            new Rule('isInt', 'id不能为空', { min: 1 }),
+        ]
+        this.content = [
+            new Rule('isLength', '通知信息不得为空', { min: 1 })
+        ]
+        this.from = [
+            new Rule('isInt', '类型必须为整数且不能为空', { min: 0 }),
+        ]
+        this.to = [
+            new Rule('isInt', '类型必须为整数且不能为空', { min: 0 })
+        ]
+    }
+    async validateToExits(vals) {
+        const toId = vals.body.to
+        const flag = await User.findOne({
+            where: { id: toId }
+        })
+        if (!flag && toId != 0) {
+            throw new Error('用户不存在')
+        }
+    }
+    async validateAnnocementExits(vals) {
+        const ID = vals.body.id
+        const flag = await Announcement.findOne({
+            where: { id: ID }
+        })
+        if (!flag) {
+            throw new Error('通知不存在')
+        }
+    }
+}
+
+
+/*
+通知删除校验器
+*/
+
+class DeleteAnnouncementValidator extends LinValidator {
+    constructor() {
+        super()
+    }
+    async validateAnnocementExits(vals) {
+        const ID = vals.body.id
+        const flag = await Announcement.findOne({
+            where: { id: ID }
+        })
+        if (!flag) {
+            throw new Error('通知不存在')
+        }
+    }
+}
+
+/*
+通知展示校验器
+*/
+
+class AdminShowAnnouncementValidator extends LinValidator {
+    constructor() {
+        super()
+    }
+    async validateToExits(vals) {
+        const toId = vals.body.from
+        const flag = await User.findOne({
+            where: { id: toId }
+        })
+        if (!flag && toId != 0) {
+            throw new Error('用户不存在')
+        }
+    }
+}
+
+class UserShowAnnouncementValidator extends LinValidator {
+    constructor() {
+        super()
+    }
+    async validateToExits(vals) {
+        const toId = vals.body.to
+        const flag = await User.findOne({
+            where: { id: toId }
+        })
+        if (!flag && toId != 0) {
+            throw new Error('用户不存在')
+        }
+    }
+}
+
+
 module.exports = {
   PositiveIntegerValidator,
   RegisterValidator,
@@ -755,5 +899,10 @@ module.exports = {
   ExerciseExistenceValidator,
   ModifyLibraryValidator,
   ResetPasswordValidator,
-
+  AnnouncementNotnullValidator,
+  ModifyAnnouncementValidator,
+  SendAnnouncementValidator,
+  DeleteAnnouncementValidator,
+  AdminShowAnnouncementValidator,
+  UserShowAnnouncementValidator,
 }
