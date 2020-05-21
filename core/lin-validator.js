@@ -20,12 +20,13 @@ class LinValidator {
     }
 
 
-    _assembleAllParams(ctx) {
+    _assembleAllParams(ctx, extra = {}) {
         return {
             body: ctx.request.body,
             query: ctx.request.query,
             path: ctx.params,
-            header: ctx.request.header
+            header: ctx.request.header,
+            extra: extra
         }
     }
 
@@ -61,7 +62,7 @@ class LinValidator {
 
     async validate(ctx, alias = {}) {
         this.alias = alias
-        let params = this._assembleAllParams(ctx)
+        let params = this._assembleAllParams(ctx, alias)
         this.data = cloneDeep(params)
         this.parsed = cloneDeep(params)
 

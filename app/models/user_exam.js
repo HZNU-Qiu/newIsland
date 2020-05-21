@@ -4,11 +4,13 @@ const { Sequelize, Model } = require('sequelize')
 class UserExam extends Model {
   /**
    * 用户报名考试
-   * @param params 参数集
+   * @param userId 用户id
+   * @param examId 考试id
    */
-  static async enroll(params) {
+  static async enroll(userId, examId) {
     return await UserExam.create({
-      ...params
+      user_id: userId,
+      exam_id: examId
     })
   }
 
@@ -31,6 +33,21 @@ class UserExam extends Model {
     `
     const data = await db.query(sql, { raw: true })
     return data[0]
+  }
+
+  /**
+   * 用户放弃考试
+   * @param userId 用户id
+   * @param examId 考试id
+   */
+  static async abandon(userId, examId) {
+    return await UserExam.destroy({
+      where: {
+        user_id: userId,
+        exam_id: examId
+      },
+      force: true
+    })
   }
 
 }

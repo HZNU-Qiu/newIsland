@@ -9,6 +9,7 @@ const { Paper } = require('../models/paper')
 const { Exam } = require('../models/exam')
 const { UserExercise } = require('../models/user_exercise')
 const { Announcement } = require('../models/announcement')
+const { UserExam } = require('../models/user_exam')
 
 /**
  * 用户注册校验器
@@ -734,27 +735,27 @@ class ResetPasswordValidator extends LinValidator {
 */
 
 class AnnouncementNotnullValidator extends LinValidator {
-    constructor() {
-        super()
-        this.content = [
-            new Rule('isLength', '通知信息不得为空', { min: 1 })
-        ]
-        this.from = [
-            new Rule('isInt', '类型必须为整数且不能为空', { min: 0 }),
-        ]
-        this.to = [
-            new Rule('isInt', '收件人类型必须为整数且不能为空', { min: 0 }),
-        ]
+  constructor() {
+    super()
+    this.content = [
+      new Rule('isLength', '通知信息不得为空', { min: 1 })
+    ]
+    this.from = [
+      new Rule('isInt', '类型必须为整数且不能为空', { min: 0 }),
+    ]
+    this.to = [
+      new Rule('isInt', '收件人类型必须为整数且不能为空', { min: 0 }),
+    ]
+  }
+  async validateToExits(vals) {
+    const toId = vals.body.to
+    const flag = await User.findOne({
+      where: { id: toId }
+    })
+    if (!flag && toId != 0) {
+      throw new Error('用户不存在')
     }
-    async validateToExits(vals) {
-        const toId = vals.body.to
-        const flag = await User.findOne({
-            where: { id: toId }
-        })
-        if (!flag && toId != 0) {
-            throw new Error('用户不存在')
-        }
-    }
+  }
 }
 
 /*
@@ -762,18 +763,18 @@ class AnnouncementNotnullValidator extends LinValidator {
 */
 
 class SendAnnouncementValidator extends LinValidator {
-    constructor() {
-        super()
+  constructor() {
+    super()
+  }
+  async validateAnnocementExits(vals) {
+    const ID = vals.body.id
+    const flag = await Announcement.findOne({
+      where: { id: ID }
+    })
+    if (!flag) {
+      throw new Error('通知不存在')
     }
-    async validateAnnocementExits(vals) {
-        const ID = vals.body.id
-        const flag = await Announcement.findOne({
-            where: { id: ID }
-        })
-        if (!flag) {
-            throw new Error('通知不存在')
-        }
-    }
+  }
 }
 
 /*
@@ -781,39 +782,39 @@ class SendAnnouncementValidator extends LinValidator {
 */
 
 class ModifyAnnouncementValidator extends LinValidator {
-    constructor() {
-        super()
-        this.id = [
-            new Rule('isInt', 'id不能为空', { min: 1 }),
-        ]
-        this.content = [
-            new Rule('isLength', '通知信息不得为空', { min: 1 })
-        ]
-        this.from = [
-            new Rule('isInt', '类型必须为整数且不能为空', { min: 0 }),
-        ]
-        this.to = [
-            new Rule('isInt', '类型必须为整数且不能为空', { min: 0 })
-        ]
+  constructor() {
+    super()
+    this.id = [
+      new Rule('isInt', 'id不能为空', { min: 1 }),
+    ]
+    this.content = [
+      new Rule('isLength', '通知信息不得为空', { min: 1 })
+    ]
+    this.from = [
+      new Rule('isInt', '类型必须为整数且不能为空', { min: 0 }),
+    ]
+    this.to = [
+      new Rule('isInt', '类型必须为整数且不能为空', { min: 0 })
+    ]
+  }
+  async validateToExits(vals) {
+    const toId = vals.body.to
+    const flag = await User.findOne({
+      where: { id: toId }
+    })
+    if (!flag && toId != 0) {
+      throw new Error('用户不存在')
     }
-    async validateToExits(vals) {
-        const toId = vals.body.to
-        const flag = await User.findOne({
-            where: { id: toId }
-        })
-        if (!flag && toId != 0) {
-            throw new Error('用户不存在')
-        }
+  }
+  async validateAnnocementExits(vals) {
+    const ID = vals.body.id
+    const flag = await Announcement.findOne({
+      where: { id: ID }
+    })
+    if (!flag) {
+      throw new Error('通知不存在')
     }
-    async validateAnnocementExits(vals) {
-        const ID = vals.body.id
-        const flag = await Announcement.findOne({
-            where: { id: ID }
-        })
-        if (!flag) {
-            throw new Error('通知不存在')
-        }
-    }
+  }
 }
 
 
@@ -822,18 +823,18 @@ class ModifyAnnouncementValidator extends LinValidator {
 */
 
 class DeleteAnnouncementValidator extends LinValidator {
-    constructor() {
-        super()
+  constructor() {
+    super()
+  }
+  async validateAnnocementExits(vals) {
+    const ID = vals.body.id
+    const flag = await Announcement.findOne({
+      where: { id: ID }
+    })
+    if (!flag) {
+      throw new Error('通知不存在')
     }
-    async validateAnnocementExits(vals) {
-        const ID = vals.body.id
-        const flag = await Announcement.findOne({
-            where: { id: ID }
-        })
-        if (!flag) {
-            throw new Error('通知不存在')
-        }
-    }
+  }
 }
 
 /*
@@ -841,33 +842,120 @@ class DeleteAnnouncementValidator extends LinValidator {
 */
 
 class AdminShowAnnouncementValidator extends LinValidator {
-    constructor() {
-        super()
+  constructor() {
+    super()
+  }
+  async validateToExits(vals) {
+    const toId = vals.body.from
+    const flag = await User.findOne({
+      where: { id: toId }
+    })
+    if (!flag && toId != 0) {
+      throw new Error('用户不存在')
     }
-    async validateToExits(vals) {
-        const toId = vals.body.from
-        const flag = await User.findOne({
-            where: { id: toId }
-        })
-        if (!flag && toId != 0) {
-            throw new Error('用户不存在')
-        }
-    }
+  }
 }
 
 class UserShowAnnouncementValidator extends LinValidator {
-    constructor() {
-        super()
+  constructor() {
+    super()
+  }
+  async validateToExits(vals) {
+    const toId = vals.body.to
+    const flag = await User.findOne({
+      where: { id: toId }
+    })
+    if (!flag && toId != 0) {
+      throw new Error('用户不存在')
     }
-    async validateToExits(vals) {
-        const toId = vals.body.to
-        const flag = await User.findOne({
-            where: { id: toId }
-        })
-        if (!flag && toId != 0) {
-            throw new Error('用户不存在')
-        }
+  }
+}
+
+/**
+ * 用户考试报名校验器
+ */
+class UserEnrollValidator extends LinValidator {
+  constructor() {
+    super()
+    this.user_id = [
+      new Rule('isInt', '用户id不能为空', { min: 1 })
+    ]
+    this.exam_id = [
+      new Rule('isInt', '考试id不能为空', { min: 1 })
+    ]
+    this.start = [
+      new Rule('isLength', '考试开始时间不能为空', { min: 1 })
+    ]
+    this.end = [
+      new Rule('isLength', '考试结束时间不能为空', { min: 1 })
+    ]
+  }
+  // 校验用户是否已经报名考试
+  async validateHasEnrolled(vals) {
+    const { user_id, exam_id } = vals.body
+    const record = await UserExam.findOne({
+      where: {
+        user_id,
+        exam_id
+      }
+    })
+    if (record) {
+      throw new Error('用户已报名此考试')
     }
+  }
+  // 校验考试是否可以报名
+  async validateExamAccessible(vals) {
+    const { user_id, exam_id, start, end } = vals.body
+    let now = new Date().getTime() / 1000
+    let startTime1 = new Date(start).getTime() / 1000
+    let endTime1 = new Date(end).getTime() / 1000
+    if (now + 300 >= startTime1) {
+      throw new Error('距开考还有不到5分钟，不得报名')
+    }
+    const exam = await Exam.findByPk(exam_id)
+    if (!exam) {
+      throw new Error('考试不存在')
+    } else if (exam.status != 0) {
+      throw new Error('考试已经结束报名')
+    }
+    let has = await db.query(`
+    SELECT e.start,e.end FROM exam e LEFT 
+    JOIN user_exam u ON u.exam_id=e.id 
+    WHERE u.user_id=${user_id} AND e.status<2
+    `, { raw: true })
+    has = has[0]
+    has.map(item => {
+      let startTime2 = new Date(item.start).getTime() / 1000
+      let endTime2 = new Date(item.end).getTime() / 1000
+      if ((startTime1 >= startTime2 && endTime1 <= endTime2) || (startTime1 < startTime2 && endTime1 >= startTime2) || (startTime1 > startTime2 && startTime2 < endTime2)) {
+        throw new Error('考试冲突')
+      }
+    })
+  }
+}
+
+/**
+ * 学生弃考校验器
+ */
+class AbandonExamValidator extends PositiveIntegerValidator {
+  constructor() {
+    super()
+  }
+  async validateAbandonAccess(vals) {
+    const userId = vals.extra.userId
+    const examId = vals.path.id
+    let data = await db.query(`
+    SELECT e.start FROM exam e 
+    LEFT JOIN user_exam u ON e.id = u.exam_id
+    WHERE u.user_id=${userId} AND u.exam_id=${examId} 
+    `, { raw: true })
+    data = data[0].start
+    let now = new Date().getTime() / 1000
+    let examStart = new Date(data).getTime() / 1000
+    if (now + 180 >= examStart) {
+      throw new Error('开考3分钟内不得弃考，开始考试后更不能弃考!')
+    }
+  }
 }
 
 
@@ -905,4 +993,6 @@ module.exports = {
   DeleteAnnouncementValidator,
   AdminShowAnnouncementValidator,
   UserShowAnnouncementValidator,
+  UserEnrollValidator,
+  AbandonExamValidator,
 }
