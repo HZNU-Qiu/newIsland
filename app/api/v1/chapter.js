@@ -29,7 +29,7 @@ router.post('/modify', async ctx => {
 /**
  * 显示题库的所有章节
  */
-router.get('/:id', async ctx => {
+router.get('/list/:id', async ctx => {
   const v = await new PositiveIntegerValidator().validate(ctx)
   const libraryId = v.get('path.id')
   const chapterList = await Chapter.list(libraryId)
@@ -52,6 +52,15 @@ router.get('/enter/:id', new Auth(4).m, async ctx => {
   const userId = ctx.auth.uid
   const libraryId = v.get('path.id')
   const data = await Chapter.listUserChapters(userId, libraryId)
+  success('ok', data)
+})
+
+/**
+ * 管理员管理章节
+ */
+router.get('/regulate', new Auth(16).m, async ctx => {
+  const admin_id = ctx.auth.uid
+  const data = await Chapter.listByadmin(admin_id)
   success('ok', data)
 })
 

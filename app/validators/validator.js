@@ -958,6 +958,73 @@ class AbandonExamValidator extends PositiveIntegerValidator {
   }
 }
 
+/**
+ * 学生考试作答校验器
+ */
+class RecordPreserveValidator extends LinValidator {
+  constructor() {
+    super()
+    this.exam_id = [
+      new Rule('isInt', '考试编号必须为正整数', { min: 1 })
+    ]
+    this.problem_id = [
+      new Rule('isInt', '题目编号必须为正整数', { min: 1 })
+    ]
+  }
+  /**
+   * 校验是否可以提交
+   */
+  async validateAccessToAdmit(vals) {
+    const { exam_id } = vals.body
+    let exam = await Exam.findByPk(exam_id)
+    let now = new Date().getTime() / 1000
+    let start = new Date(exam.start).getTime() / 1000
+    let end = new Date(exam.end).getTime() / 1000
+    if (now < start) {
+      throw new Error('考试还未开始不能答题')
+    } else if(now >= end) {
+      throw new Error('考试已结束不能答题')
+    }
+  }
+}
+
+/**
+ * 考试开始校验器
+ */
+class StartToExamValidator extends PositiveIntegerValidator {
+  constructor() {
+    super()
+  }
+  /**
+   * 是否可以开始考试
+   */
+  async validateExamIsStart(vals) {
+    const id = vals.path.id
+    let exam = await Exam.findByPk(id)
+    let now = new Date().getTime() / 1000
+    let start = new Date(exam.start).getTime() / 1000
+    if (now < start) {
+      throw new Error('考试还没有开始')
+    }
+  }
+}
+
+/**
+ * 批改试卷校验器
+ */
+class JudgeValidator extends PositiveIntegerValidator {
+  constructor() {
+    super()
+  }
+  // 校验考试是否已经结束
+  async validateExamIsEnd(vals) {
+    const exam_id = vals.path.id
+    const exam = await Exam.findByPk(exam_id)
+    if(parseInt(exam.status) !== 2) {
+      throw new Error('现在不是改卷阶段不能改卷')
+    }
+  }
+}
 
 module.exports = {
   PositiveIntegerValidator,
@@ -995,4 +1062,8 @@ module.exports = {
   UserShowAnnouncementValidator,
   UserEnrollValidator,
   AbandonExamValidator,
+  RecordPreserveValidator,
+  StartToExamValidator,
+  JudgeValidator,
+  
 }

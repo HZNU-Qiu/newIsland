@@ -22,7 +22,7 @@ class UserExam extends Model {
    */
   static async listUserExams(currentPage, userId, status) {
     const offset = (currentPage - 1) * 10
-    if (parseInt(status) !== 3)
+    if (parseInt(status) > 3 || parseInt(status) < 0)
       status = 0
     let sql = `
     SELECT e.id,e.name,e.start,e.end,e.status,u.grade 

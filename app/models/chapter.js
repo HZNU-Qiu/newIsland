@@ -64,6 +64,23 @@ class Chapter extends Model {
     return chapter
   }
 
+  /**
+   * 根据管理员id返回管理题库的所有章节
+   * @param admin_id 管理员id
+   */
+  static async listByadmin(admin_id) {
+    let sql = `
+    SELECT c.id,c.name,c.exercise_num FROM chapter c 
+    JOIN library l ON l.id=c.library_id
+    WHERE l.admin_id=${admin_id}
+    `
+    let data = {}
+    let record = await db.query(sql, { raw: true })
+    data.rows = record[0]
+    data.count = record[0].length
+    return data
+  }
+
 }
 
 Chapter.init({
