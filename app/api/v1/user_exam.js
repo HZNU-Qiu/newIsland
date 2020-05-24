@@ -3,6 +3,8 @@ const router = new Router({ prefix: '/v1/userexam' })
 const {
   UserEnrollValidator,
   AbandonExamValidator,
+  ClearUserExamValidator,
+  ClearByBatchValidator,
 
 } = require('../../validators/validator')
 const { UserExam } = require('../../models/user_exam')
@@ -41,5 +43,24 @@ router.get('/mine', new Auth(4).m, async ctx => {
   success('ok', data)
 })
 
+/**
+ * 清除用户考试记录
+ */
+router.get('/clearOne', new Auth(16).m, async ctx => {
+  const v = await new ClearUserExamValidator().validate(ctx)
+  const {user_id, exam_id} = v.get('query')
+  await UserExam.clearOne(user_id, exam_id)
+  success('ok')
+})
+
+/**
+ * 清楚某场考试的所有记录
+ */
+router.get('/clearAll/:id', new Auth(16).m, async ctx => {
+  const v = await new ClearByBatchValidator().validate(ctx)
+  const id = v.get('path.id')
+  await UserExam.clear(id)
+  success('ok')
+})
 
 module.exports = router

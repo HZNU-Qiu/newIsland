@@ -5,6 +5,7 @@ const {
   AddPaperModelValidator,
   AssemblePaperValidator,
   PositiveIntegerValidator,
+  BanPaperValidator,
 
 } = require('../../validators/validator')
 const { Paper } = require('../../models/paper')
@@ -61,6 +62,26 @@ router.get('/list', async ctx => {
   const { library_id = null, type = null } = ctx.request.query
   const data = await Paper.listByType(library_id, type)
   success('ok', data)
+})
+
+/**
+ * 禁用试卷
+ */
+router.get('/ban/:id', new Auth(16).m, async ctx => {
+  const v = await new BanPaperValidator().validate(ctx)
+  const id = v.get('path.id')
+  await Paper.ban(id)
+  success('ok')
+})
+
+/**
+ * 启用试卷
+ */
+router.get('/activate/:id', new Auth(16).m, async ctx => {
+  const v = await new PositiveIntegerValidator().validate(ctx)
+  const id = v.get('path.id')
+  await Paper.activate(id)
+  success('ok')
 })
 
 

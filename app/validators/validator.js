@@ -377,7 +377,7 @@ class AddExerciseValidator extends LinValidator {
       new Rule('isInt', '困难级别只有三种', { min: 1, max: 3 })
     ]
     this.status = [
-      new Rule('isInt', '类型只有两种', { min: 1, max: 2 })
+      new Rule('isInt', '类型只有两种', { min: 0, max: 1 })
     ]
   }
   async validateContent(vals) {
@@ -982,7 +982,7 @@ class RecordPreserveValidator extends LinValidator {
     let end = new Date(exam.end).getTime() / 1000
     if (now < start) {
       throw new Error('考试还未开始不能答题')
-    } else if(now >= end) {
+    } else if (now >= end) {
       throw new Error('考试已结束不能答题')
     }
   }
@@ -1020,10 +1020,147 @@ class JudgeValidator extends PositiveIntegerValidator {
   async validateExamIsEnd(vals) {
     const exam_id = vals.path.id
     const exam = await Exam.findByPk(exam_id)
-    if(parseInt(exam.status) !== 2) {
+    if (parseInt(exam.status) !== 2) {
       throw new Error('现在不是改卷阶段不能改卷')
     }
   }
+}
+
+/**
+ * 删除章节校验器
+ */
+class DeleteChapterValidator extends PositiveIntegerValidator {
+  constructor() {
+    super()
+  }
+  // 校验删除权限
+  async validateAccessToDeleteChapter(vals) {
+    const id = vals.path.id
+    const chapter = await Chapter.findByPk(id)
+    if (parseInt(chapter.exercise_num) !== 0) {
+      throw new Error('章节下有题目，先删除所有题目')
+    }
+  }
+}
+
+/**
+ * 删除题目校验器
+ */
+class DeleteExerciseValidator extends PositiveIntegerValidator {
+  constructor() {
+    super()
+    this.chapter = [
+      new Rule('isInt', '章节id为正整数', { min: 1 })
+    ]
+  }
+  // 题目是否可以删除
+  async validateAccessToDeleteExercise(vals) {
+    const { id, chapter } = vals.query
+    const record = await Exercise.findOne({
+      where: {
+        id,
+        chapter
+      }
+    })
+    if (!record) {
+      throw new Error('章节号与题目id不对应')
+    }
+    let sql = `
+    SELECT DISTINCT p.problem_list FROM paper p 
+    JOIN chapter c ON c.library_id=p.library_id
+    JOIN exercise e ON e.chapter=c.id
+    WHERE e.id=${id}
+    `
+    let problem_list = await db.query(sql, { raw: true })
+    problem_list = problem_list[0]
+    problem_list.map(item => {
+      let testArr = item.problem_list.split(',')
+      if (testArr.includes(id)) {
+        throw new Error('题目已被编入试卷，请先将题目从试卷中删除')
+      }
+    })
+  }
+}
+
+/**
+ * 禁用试卷校验器
+ */
+class BanPaperValidator extends PositiveIntegerValidator {
+  constructor() {
+    super()
+  }
+  // 是否可以禁用校验
+  async validateAccessToBanPaper(vals) {
+    const id = vals.path.id
+    const paper = await Paper.findOne({
+      where: {
+        id,
+        status: 1
+      }
+    })
+    if (!paper) {
+      throw new Error('试卷不存在或者已被禁用')
+    } else if (parseInt(paper.type) === 2) {
+      const exam = await Exam.findOne({
+        where: {
+          paper_id: id
+        }
+      })
+      if (exam) {
+        throw new Error('该试卷已纳入考试，请先清理考试记录')
+      }
+    }
+  }
+}
+
+/**
+ * 批量删除用户考试记录校验器
+ */
+class ClearByBatchValidator extends PositiveIntegerValidator {
+  constructor() {
+    super()
+  }
+  async validateAccessToClear(vals) {
+    const id = vals.path.id
+    const exam = await Exam.findByPk(id)
+    if (parseInt(exam.status) !== 3) {
+      throw new Error('考试还没有结束不能删除用户考试记录')
+    }
+  }
+}
+
+/**
+ * 某个用户考试记录校验器
+ */
+class ClearUserExamValidator extends LinValidator {
+  constructor() {
+    super()
+    this.user_id = [
+      new Rule('isInt', '用户id为正整数', { min: 1 })
+    ]
+    this.exam_id = [
+      new Rule('isInt', '考试id为正整数', { min: 1 })
+    ]
+  }
+  // 校验开始记录是否可以删除
+  async validateAccessToDeleteUserExam(vals) {
+    const { user_id, exam_id } = vals.query
+    const record = await UserExam.findOne({
+      where: {
+        user_id,
+        exam_id
+      }
+    })
+    if (!record) {
+      throw new Error('记录不存在,或已被删除')
+    } else {
+      const exam = await Exam.findByPk(exam_id)
+      if (parseInt(exam.status) !== 3) {
+        throw new Error('考试还没有结束不能删除用户考试记录')
+      }
+    }
+  }
+
 }
 
 module.exports = {
@@ -1065,5 +1202,10 @@ module.exports = {
   RecordPreserveValidator,
   StartToExamValidator,
   JudgeValidator,
-  
+  DeleteChapterValidator,
+  DeleteExerciseValidator,
+  BanPaperValidator,
+  ClearUserExamValidator,
+  ClearByBatchValidator,
+
 }

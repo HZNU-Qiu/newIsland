@@ -4,7 +4,9 @@ const {
   AddExerciseValidator,
   PositiveIntegerValidator,
   ModifyExerciseValidator,
-  IsLibraryExistValidator
+  IsLibraryExistValidator,
+  DeleteExerciseValidator,
+
 } = require('../../validators/validator')
 const { Exercise } = require('../../models/exercise')
 const { success } = require('../../lib/helper')
@@ -70,6 +72,16 @@ router.get('/simulate/:id', new Auth(4).m, async ctx => {
   const id = v.get('path.id')
   const data = await Exercise.simulateExam(id)
   success('ok', data)
+})
+
+/**
+ * 删除题目
+ */
+router.get('/delete', new Auth(16).m, async ctx => {
+  const v = await new DeleteExerciseValidator().validate(ctx)
+  const { id, chapter } = v.get('query')
+  await Exercise.delete(id, chapter)
+  success('ok')
 })
 
 module.exports = router

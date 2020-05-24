@@ -1,7 +1,9 @@
 const Router = require('koa-router')
 const router = new Router({ prefix: '/v1/chapter' })
-const { PositiveIntegerValidator,
-  AddChapterValidator } = require('../../validators/validator')
+const { 
+  PositiveIntegerValidator,
+  AddChapterValidator,
+  DeleteChapterValidator, } = require('../../validators/validator')
 const { Chapter } = require('../../models/chapter')
 const { success } = require('../../lib/helper')
 const { Auth } = require('../../../middlewares/auth')
@@ -62,6 +64,16 @@ router.get('/regulate', new Auth(16).m, async ctx => {
   const admin_id = ctx.auth.uid
   const data = await Chapter.listByadmin(admin_id)
   success('ok', data)
+})
+
+/**
+ * 题库删除章节
+ */
+router.get('/delete/:id', new Auth(16).m, async ctx => {
+  const v = await new DeleteChapterValidator().validate(ctx)
+  const id = v.get('path.id')
+  await Chapter.delete(id)
+  success('ok')
 })
 
 module.exports = router

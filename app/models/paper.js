@@ -80,6 +80,34 @@ class Paper extends Model {
     return data
   }
 
+  /**
+   * 禁用试卷
+   * @param id 试卷id
+   */
+  static async ban(id) {
+    return await Paper.update({
+      status: 0
+    }, {
+      where: {
+        id
+      }
+    })
+  }
+
+  /**
+   * 启用试卷
+   * @param id 试卷id
+   */
+  static async activate(id) {
+    return await Paper.update({
+      status: 1
+    }, {
+      where: {
+        id
+      }
+    })
+  }
+
 }
 
 Paper.init({
