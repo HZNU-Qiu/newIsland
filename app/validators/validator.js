@@ -982,7 +982,7 @@ class RecordPreserveValidator extends LinValidator {
     let end = new Date(exam.end).getTime() / 1000
     if (now < start) {
       throw new Error('考试还未开始不能答题')
-    } else if(now >= end) {
+    } else if (now >= end) {
       throw new Error('考试已结束不能答题')
     }
   }
@@ -1020,8 +1020,63 @@ class JudgeValidator extends PositiveIntegerValidator {
   async validateExamIsEnd(vals) {
     const exam_id = vals.path.id
     const exam = await Exam.findByPk(exam_id)
-    if(parseInt(exam.status) !== 2) {
+    if (parseInt(exam.status) !== 2) {
       throw new Error('现在不是改卷阶段不能改卷')
+    }
+  }
+}
+
+/**
+ * 用户禁用校验器
+ */
+class BanUserValidator extends PositiveIntegerValidator {
+  constructor() {
+    super()
+  }
+  async validateAccessToBanUser(vals) {
+    const id = vals.path.id
+    // 先校验用户是否存在或者是否已经被禁用
+    const user = await User.findOne({
+      where: {
+        id,
+        status: 1
+      }
+    })
+    if (!user) {
+      throw new Error('用户不存在或者已被禁用')
+    } else {
+      let exams = await db.query(`
+      SELECT DISTINCT e.status FROM exam e 
+      JOIN user_exam u ON e.id=u.exam_id
+      WHERE u.user_id=${id}
+      `, { raw: true })
+      exams = exams[0]
+      exams.map(item => {
+        if (item.status !== 3) {
+          throw new Error('用户有没有结束的考试,请先清楚用户的所有考试及其记录')
+        }
+      })
+    }
+  }
+}
+
+/**
+ * 用户删除校验器
+ */
+class DeleteUserValidator extends PositiveIntegerValidator {
+  constructor() {
+    super()
+  }
+  async validateAccessTodelete(vals) {
+    const id = vals.path.id
+    const user = await User.findOne({
+      where: {
+        id,
+        status: 0
+      }
+    })
+    if (!user) {
+      throw new Error('用户不存在或者未被禁用,请先禁用用户')
     }
   }
 }
@@ -1065,5 +1120,7 @@ module.exports = {
   RecordPreserveValidator,
   StartToExamValidator,
   JudgeValidator,
-  
+  BanUserValidator,
+  DeleteUserValidator,
+
 }
