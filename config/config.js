@@ -1,6 +1,6 @@
 module.exports = {
   // 项目环境：dev|prod
-  environment: 'dev',
+  environment: 'prod',
 
   // 数据库配置
   database: {

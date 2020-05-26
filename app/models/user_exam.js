@@ -50,6 +50,35 @@ class UserExam extends Model {
     })
   }
 
+  /**
+   * 删除用户考试记录
+   * @param user_id 用户id
+   * @param exam_id 考试id
+   */
+  static async clearOne(user_id, exam_id) {
+    return await UserExam.destroy({
+      where: {
+        user_id,
+        exam_id
+      },
+      force: true
+    })
+  }
+
+  /**
+   * 删除用户考试记录
+   * @param exam_id 考试id
+   */
+  static async clear(exam_id) {
+    return await UserExam.destroy({
+      where: {
+        exam_id
+      },
+      force: true
+    })
+  }
+
+
 }
 
 UserExam.init({

@@ -70,7 +70,7 @@ class Chapter extends Model {
    */
   static async listByadmin(admin_id) {
     let sql = `
-    SELECT c.id,c.name,c.exercise_num FROM chapter c 
+    SELECT c.id,c.name,c.exercise_num,library_id FROM chapter c 
     JOIN library l ON l.id=c.library_id
     WHERE l.admin_id=${admin_id}
     `
@@ -79,6 +79,19 @@ class Chapter extends Model {
     data.rows = record[0]
     data.count = record[0].length
     return data
+  }
+
+  /**
+   * 删除章节
+   * @param id 章节id
+   */
+  static async delete(id) {
+    return await Chapter.destroy({
+      where: {
+        id
+      }, 
+      force: true
+    })
   }
 
 }

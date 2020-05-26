@@ -135,6 +135,27 @@ class Exercise extends Model {
     return data
   }
 
+  /**
+   * 删除题目
+   * @param id 题目id
+   * @param chapter_id 章节id
+   */
+  static async delete(id, chapter_id) {
+    const { Chapter } = require('./chapter')
+    let chapter = await Chapter.findByPk(chapter_id)
+    db.transaction(async t => {
+      await Exercise.destroy({
+        where: {
+          id
+        },
+        force: true
+      }, { transaction: t })
+      return await chapter.decrement('exercise_num', { by: 1, transaction: t })
+    })
+
+  }
+
+
 }
 
 Exercise.init({
