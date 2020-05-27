@@ -624,6 +624,35 @@ class BanLibraryValidator extends PositiveIntegerValidator {
 }
 
 /**
+ * 题库删除
+ */
+class DeleteLibraryValidator extends PositiveIntegerValidator {
+  constructor() {
+    super()
+  }
+  async validateLibraryHasBanned(vals) {
+    const id = vals.path.id
+    const library = await Library.findOne({
+      where: {
+        id,
+        status: 0
+      }
+    })
+    if (!library) {
+      throw new Error('题库不存在或者题库未被禁用')
+    }
+    const chapter = await Chapter.findOne({
+      where: {
+        library_id: id
+      }
+    })
+    if (chapter) {
+      throw new Error('题库内还有章节,先删除所有章节再删除题库')
+    }
+  }
+}
+
+/**
  * 题库是否可用校验器
  */
 class IsLibraryAccessibleValidator extends PositiveIntegerValidator {
@@ -1003,9 +1032,10 @@ class StartToExamValidator extends PositiveIntegerValidator {
     let exam = await Exam.findByPk(id)
     let now = new Date().getTime() / 1000
     let start = new Date(exam.start).getTime() / 1000
+    let end = new Date(exam.end).getTime() / 1000
     if (now < start) {
       throw new Error('考试还没有开始')
-    }
+    } 
   }
 }
 
@@ -1160,8 +1190,29 @@ class ClearUserExamValidator extends LinValidator {
       }
     }
   }
-
 }
+
+/**
+ * 试卷删除校验器
+ */
+class DeletePaperValidator extends PositiveIntegerValidator {
+  constructor() {
+    super()
+  }
+  async validatePaperhasBanned(vals) {
+    const id = vals.path.id
+    const paper = await Paper.findOne({
+      where: {
+        id,
+        status: 0
+      }
+    })
+    if (!paper) {
+      throw new Error('试卷不存在或者被未被禁用')
+    }
+  }
+}
+
 
 module.exports = {
   PositiveIntegerValidator,
@@ -1207,5 +1258,8 @@ module.exports = {
   BanPaperValidator,
   ClearUserExamValidator,
   ClearByBatchValidator,
+  DeletePaperValidator,
+  DeleteLibraryValidator,
+
 
 }

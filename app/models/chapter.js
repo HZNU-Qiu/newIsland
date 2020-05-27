@@ -86,11 +86,24 @@ class Chapter extends Model {
    * @param id 章节id
    */
   static async delete(id) {
-    return await Chapter.destroy({
-      where: {
-        id
-      }, 
-      force: true
+    const { Exercise } = require('./exercise')
+    await db.transcation(async t => {
+      await Exercise.destroy({
+        where: {
+          chapter: id
+        },
+        force: true
+      }, {
+        transcation: t
+      })
+      return await Chapter.destroy({
+        where: {
+          id
+        },
+        force: true
+      }, {
+        transcation: t
+      })
     })
   }
 

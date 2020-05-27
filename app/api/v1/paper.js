@@ -6,6 +6,7 @@ const {
   AssemblePaperValidator,
   PositiveIntegerValidator,
   BanPaperValidator,
+  DeletePaperValidator,
 
 } = require('../../validators/validator')
 const { Paper } = require('../../models/paper')
@@ -84,5 +85,14 @@ router.get('/activate/:id', new Auth(16).m, async ctx => {
   success('ok')
 })
 
+/**
+ * 删除试卷
+ */
+router.get('/delete/:id', new Auth(16).m, async ctx => {
+  const v = await new DeletePaperValidator().validate(ctx)
+  const id = v.get('path.id')
+  await Paper.delete(id)
+  success('ok')
+})
 
 module.exports = router

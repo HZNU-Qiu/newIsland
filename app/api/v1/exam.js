@@ -32,7 +32,7 @@ router.post('/modify', async ctx => {
 /**
  * 考试列表接口
  */
-router.get('/', async ctx => {
+router.get('/', new Auth(4).m, async ctx => {
   const { library_id, status } = ctx.request.query
   const data = await Exam.listByStatus(library_id, status)
   success('ok', data)

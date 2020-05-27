@@ -108,6 +108,20 @@ class Paper extends Model {
     })
   }
 
+  /**
+   * 禁用试卷
+   * @param id 试卷id
+   */
+  static async delete(vals) {
+    return await Paper.destroy({
+      where: {
+        id,
+        status: 0
+      }, 
+      force: true
+    })
+  }
+
 }
 
 Paper.init({

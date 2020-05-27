@@ -103,6 +103,20 @@ class Library extends Model {
       }
     })
   }
+
+  /**
+   * 删除题库
+   * @param id 题库id
+   */
+  static async delete(id) {
+    return await Library.destroy({
+      where: {
+        id,
+        status: 0
+      },
+      force: true
+    })
+  }
 }
 
 Library.init({
