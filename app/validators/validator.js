@@ -1057,18 +1057,6 @@ class JudgeValidator extends PositiveIntegerValidator {
 }
 
 /**
-<<<<<<< HEAD
- * 用户禁用校验器
- */
-class BanUserValidator extends PositiveIntegerValidator {
-  constructor() {
-    super()
-  }
-  async validateAccessToBanUser(vals) {
-    const id = vals.path.id
-    // 先校验用户是否存在或者是否已经被禁用
-    const user = await User.findOne({
-=======
  * 删除章节校验器
  */
 class DeleteChapterValidator extends PositiveIntegerValidator {
@@ -1135,28 +1123,11 @@ class BanPaperValidator extends PositiveIntegerValidator {
   async validateAccessToBanPaper(vals) {
     const id = vals.path.id
     const paper = await Paper.findOne({
->>>>>>> 8b1f52fcaf2c84b5059b12c7ecdc003568d4fb20
       where: {
         id,
         status: 1
       }
     })
-<<<<<<< HEAD
-    if (!user) {
-      throw new Error('用户不存在或者已被禁用')
-    } else {
-      let exams = await db.query(`
-      SELECT DISTINCT e.status FROM exam e 
-      JOIN user_exam u ON e.id=u.exam_id
-      WHERE u.user_id=${id}
-      `, { raw: true })
-      exams = exams[0]
-      exams.map(item => {
-        if (item.status !== 3) {
-          throw new Error('用户有没有结束的考试,请先清楚用户的所有考试及其记录')
-        }
-      })
-=======
     if (!paper) {
       throw new Error('试卷不存在或者已被禁用')
     } else if (parseInt(paper.type) === 2) {
@@ -1168,32 +1139,11 @@ class BanPaperValidator extends PositiveIntegerValidator {
       if (exam) {
         throw new Error('该试卷已纳入考试，请先清理考试记录')
       }
->>>>>>> 8b1f52fcaf2c84b5059b12c7ecdc003568d4fb20
     }
   }
 }
 
 /**
-<<<<<<< HEAD
- * 用户删除校验器
- */
-class DeleteUserValidator extends PositiveIntegerValidator {
-  constructor() {
-    super()
-  }
-  async validateAccessTodelete(vals) {
-    const id = vals.path.id
-    const user = await User.findOne({
-      where: {
-        id,
-        status: 0
-      }
-    })
-    if (!user) {
-      throw new Error('用户不存在或者未被禁用,请先禁用用户')
-    }
-  }
-=======
  * 批量删除用户考试记录校验器
  */
 class ClearByBatchValidator extends PositiveIntegerValidator {
@@ -1242,7 +1192,6 @@ class ClearUserExamValidator extends LinValidator {
   }
 }
 
-<<<<<<< HEAD
 /**
  * 试卷删除校验器
  */
@@ -1262,9 +1211,6 @@ class DeletePaperValidator extends PositiveIntegerValidator {
       throw new Error('试卷不存在或者被未被禁用')
     }
   }
-=======
->>>>>>> 8b1f52fcaf2c84b5059b12c7ecdc003568d4fb20
->>>>>>> a8c16b0686278f81156d421a2b69f9401612ffaa
 }
 
 
@@ -1307,21 +1253,13 @@ module.exports = {
   RecordPreserveValidator,
   StartToExamValidator,
   JudgeValidator,
-<<<<<<< HEAD
-  BanUserValidator,
-  DeleteUserValidator,
-=======
   DeleteChapterValidator,
   DeleteExerciseValidator,
   BanPaperValidator,
   ClearUserExamValidator,
   ClearByBatchValidator,
-<<<<<<< HEAD
   DeletePaperValidator,
   DeleteLibraryValidator,
 
-=======
->>>>>>> 8b1f52fcaf2c84b5059b12c7ecdc003568d4fb20
->>>>>>> a8c16b0686278f81156d421a2b69f9401612ffaa
 
 }
