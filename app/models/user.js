@@ -140,6 +140,63 @@ class User extends Model {
     return data[0]
   }
 
+  /**
+   * 用户删除
+   * @param id 用户id
+   */
+  static async delete(id) {
+    const { UserExam } = require('./user_exam')
+    const { UserExercise } = require('./user_exercise')
+    const { UserLibrary } = require('./user_library')
+    const { Announcement } = require('./announcement')
+    let funcArr = []
+    await db.transaction(async t => {
+      funcArr.push(UserExam.destroy({
+        where: {
+          user_id: id
+        },
+        force: true
+      }, {
+        transaction: t
+      }))
+      funcArr.push(UserExercise.destroy({
+        where: {
+          user_id: id
+        },
+        force: true
+      }, {
+        transaction: t
+      }))
+      funcArr.push(UserLibrary.destroy({
+        where: {
+          user_id: id
+        },
+        force: true
+      }, {
+        transaction: t
+      }))
+      funcArr.push(Announcement.destroy({
+        where: {
+          from: id
+        },
+        force: true
+      }, {
+        transaction: t
+      }))
+      let promise = Promise.all(funcArr)
+      return promise.then(() => {
+        User.destroy({
+          where: {
+            id
+          },
+          force: true
+        }, {
+          transaction: t
+        })
+      })
+    })
+  }
+
 }
 
 User.init({

@@ -16,7 +16,7 @@ router.post('/test/:id/latest',async (ctx, next) => {
     + "int main() { \n"
     + "int a,b; \n"
     + "scanf(\"%d%d\", &a,&b);\n"
-    + "printf(\"%d\\n\", a+b);\n"
+    + "printf(\"%d\\n\", a-b);\n"
     + "return 0;}",
     "language_config": {
       "compile": {

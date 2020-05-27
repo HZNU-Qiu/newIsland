@@ -8,6 +8,8 @@ const {
   BanLibraryValidator,
   ActivateLibraryValidator,
   ModifyLibraryValidator,
+  DeleteLibraryValidator,
+
 
 } = require('../../validators/validator')
 const { Library } = require('../../models/library')
@@ -74,10 +76,20 @@ router.get('/ban/:id', async ctx => {
 /**
  * 编辑题库
  */
-router.post('/modify',new Auth(16).m ,async ctx => {
+router.post('/modify', new Auth(16).m ,async ctx => {
   const v = await new ModifyLibraryValidator().validate(ctx)
   const library = v.get('body')
   await Library.modify(library)
+  success('ok')
+})
+
+/**
+ * 删除题库
+ */
+router.get('/delete/:id', new Auth(16).m, async ctx => {
+  const v = await new DeleteLibraryValidator().validate(ctx)
+  const id = v.get('path.id')
+  await Library.delete(id)
   success('ok')
 })
 

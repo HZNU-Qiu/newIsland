@@ -5,6 +5,8 @@ const { RegisterValidator,
   AccountDesignateValidator,
   UserInfoValidator,
   ResetPasswordValidator,
+  BanUserValidator,
+  DeleteUserValidator,
 
 } = require('../../validators/validator')
 const { User } = require('../../models/user')
@@ -61,7 +63,7 @@ router.get('/list', new Auth(32).m, async ctx => {
  * 普通用户禁用接口
  */
 router.get('/ban/:id', new Auth(32).m, async ctx => {
-  const v = await new PositiveIntegerValidator().validate(ctx)
+  const v = await new BanUserValidator().validate(ctx)
   await User.banUser(v.get('path.id'))
   success('ok')
 })
@@ -118,6 +120,16 @@ router.post('/reset', new Auth(4).m, async ctx => {
 router.get('/preassign', new Auth(32).m, async ctx => {
   const data = await User.getUnassignedAdmin()
   success('ok', data)
+})
+
+/**
+ * 用户删除接口
+ */
+router.get('/delete/:id', new Auth(32).m, async ctx => {
+  const v = await new DeleteUserValidator().validate(ctx)
+  const id = v.get('path.id')
+  await User.delete(id)
+  success('ok')
 })
 
 module.exports = router
