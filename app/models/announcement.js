@@ -61,7 +61,7 @@ class Announcement extends Model {
     static async AdminShow(params) {
         return await Announcement.findAndCountAll({
             where: {
-                from: params.from
+                from: params
             },
         })
     }
@@ -69,7 +69,7 @@ class Announcement extends Model {
     static async UserShow(params) {
         return await Announcement.findAndCountAll({
             where: {
-                to: params.to,
+                to: params,
                 status: 1
             },
         })

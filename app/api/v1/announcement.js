@@ -74,17 +74,17 @@ router.post('/user/delete', async(ctx) => {
 /*
 通知展示接口
 */
-router.get('/admin', async(ctx) => {
+router.get('/admin/:id', async(ctx) => {
     const v = await new AdminShowAnnouncementValidator().validate(ctx)
-    const vals = ctx.request.body
-    exercise = await Announcement.AdminShow(vals)
+    const fromId = v.get('path.id')
+    exercise = await Announcement.AdminShow(fromId)
     success('ok', exercise)
 })
 
-router.get('/user', async(ctx) => {
+router.get('/user/:id', async(ctx) => {
     const v = await new UserShowAnnouncementValidator().validate(ctx)
-    const vals = ctx.request.body
-    exercise = await Announcement.UserShow(vals)
+    const toId = v.get('path.id')
+    exercise = await Announcement.UserShow(toId)
     success('ok', exercise)
 })
 
