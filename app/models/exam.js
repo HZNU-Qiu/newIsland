@@ -34,11 +34,11 @@ class Exam extends Model {
    */
   static async listByStatus(library_id, status) {
     let sql = `
-    SELECT e.id,e.name,e.start,e.end,e.status 
+    SELECT e.id,e.name,e.start,e.end,e.status,e.paper_id 
     FROM exam e LEFT JOIN paper p ON e.paper_id = p.id
     WHERE p.library_id = ${library_id} 
     `
-    switch (status) {
+    switch (parseInt(status)) {
       case 0:
         sql += `AND e.status = 0`
         break

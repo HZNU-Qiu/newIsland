@@ -90,3 +90,18 @@ class FakeAdmin {
 
 //   }
 // }
+
+const request = require('./app/lib/http_request_helper')
+  let req = new RegExp('\\\\n', 'g')
+  let text = '#include<stdio.h>\n int main() {\n  int a,b; \n scanf("%d%d", &a,&b);\n printf("%d\n", a+b);\n return 0;}'.replace(req, '\n')
+  /*async function func1() {
+  await request.POST('http://localhost:3000/v1/onlineJudge/judge', {
+    "src": "#include<stdio.h> int main() {  int a,b; \r scanf(\"%d%d\", &a,&b);\\n printf(\"%d\\n\", a+b);\n return 0;}"
+})
+  }
+try {
+  func1()
+} catch (error) {
+  
+}*/
+console.log(text)

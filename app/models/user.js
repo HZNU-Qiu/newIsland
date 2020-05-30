@@ -18,7 +18,7 @@ class User extends Model {
    * 用户账号密码登录
    */
   static async signIn(account, password) {
-    const user = await User.findOne({
+    let user = await User.findOne({
       where: { account: account, status: 1 }
     })
     // 如果用户不存在
@@ -28,6 +28,15 @@ class User extends Model {
     const correct = bcryptjs.compareSync(password, user.password)
     if (!correct) {
       throw new global.errs.AuthFailed('账号密码错误')
+    }
+    if (user.type === 16) {
+      const { Library } = require('./library')
+      const library = await Library.findOne({
+        where: {
+          admin_id: user.id
+        }
+      })
+      user.dataValues.library_id = library.id
     }
     return user
   }

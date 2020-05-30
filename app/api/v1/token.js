@@ -47,7 +47,7 @@ router.post('/signin', async ctx => {
   const v = await new LoginParametersValidator().validate(ctx)
   const account = v.get('body.account')
   const password = v.get('body.password')
-  const { token, user } = await accountLogin(account, password)
+  let { token, user } = await accountLogin(account, password)
   success(user.username + '欢迎您', { token, user })
 })
 
@@ -83,7 +83,7 @@ router.get('/github', async ctx => {
  * @returns {Promise<void>}
  */
 async function accountLogin(account, secret) {
-  const user = await User.signIn(account, secret)
+  let user = await User.signIn(account, secret)
   let scope = 4
   switch (user.type) {
     case 4:

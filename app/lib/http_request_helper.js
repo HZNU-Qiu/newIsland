@@ -26,6 +26,4 @@ class RequestHelper {
   }
 }
 
-
-
 module.exports = RequestHelper;
