@@ -94,7 +94,7 @@ class Exercise extends Model {
       list[item.id] = {
         id: item.id,
         name: item.name,
-        child: {}
+        child: []
       }
       idArray.push(item.id)
     })
@@ -112,7 +112,7 @@ class Exercise extends Model {
     let exercise = await db.query(
       sql, { raw: true })
     exercise[0].map(item => {
-      list[item.chapter].child[item.id] = item
+      list[item.chapter].child.push(item)
     })
     return await list
   }

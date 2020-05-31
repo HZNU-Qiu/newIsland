@@ -38,8 +38,8 @@ router.get('/abandon/:id', new Auth(4).m, async ctx => {
  */
 router.get('/mine', new Auth(4).m, async ctx => {
   const id = ctx.auth.uid
-  const { currentPage = 1, status } = ctx.request.query
-  const data = await UserExam.listUserExams(currentPage, id, status)
+  const { currentPage = 1 } = ctx.request.query
+  const data = await UserExam.listUserExams(currentPage, id)
   success('ok', data)
 })
 

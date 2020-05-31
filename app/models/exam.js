@@ -31,8 +31,9 @@ class Exam extends Model {
    * 根据考试状态展示考试
    * @param library_id 考试编号
    * @param status 考试状态
+   * @param user_id 用户id
    */
-  static async listByStatus(library_id, status) {
+  static async listByStatus(library_id, status, user_id = 0) {
     let sql = `
     SELECT e.id,e.name,e.start,e.end,e.status,e.paper_id 
     FROM exam e LEFT JOIN paper p ON e.paper_id = p.id
@@ -54,8 +55,21 @@ class Exam extends Model {
       default:
         break
     }
-    const data = await db.query(sql, { raw: true })
-    return data[0]
+    let data = await db.query(sql, { raw: true })
+    data = data[0]
+    if (user_id) {
+      let userexam = await db.query(`SELECT exam_id FROM user_exam WHERE user_id=${user_id}`, { raw: true })
+      userexam = userexam[0]
+      data.map(item1 => {
+        item1.has = 0
+        userexam.map(item2 => {
+          if (item1.id === item2.exam_id) {
+            item1.has = 1
+          }
+        })
+      })
+    }
+    return data
   }
 
 }

@@ -34,7 +34,8 @@ router.post('/modify', async ctx => {
  */
 router.get('/', new Auth(4).m, async ctx => {
   const { library_id, status } = ctx.request.query
-  const data = await Exam.listByStatus(library_id, status)
+  const user_id = ctx.auth.uid
+  const data = await Exam.listByStatus(library_id, status, user_id)
   success('ok', data)
 })
 
