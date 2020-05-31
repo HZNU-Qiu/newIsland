@@ -36,7 +36,11 @@ class User extends Model {
           admin_id: user.id
         }
       })
-      user.dataValues.library_id = library.id
+      if (library) {
+        user.dataValues.library_id = library.id
+      } else {
+        user.dataValues.library_id = null
+      }
     }
     return user
   }
