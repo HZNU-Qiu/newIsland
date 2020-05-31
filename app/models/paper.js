@@ -4,19 +4,17 @@ const { Sequelize, Model } = require('sequelize')
 class Paper extends Model {
   /**
    * 分页展示 一页20个试卷记录
-   * @param params 参数集
+   * @param currentPage 当前页码
+   * @param user_id 用户id
    */
-  static async listByPage(params) {
-    let { currentPage, type, library_id, status } = params
+  static async listByPage(currentPage, user_id) {
     let offset = (currentPage - 1) * 20
     let sql = `
-    SELECT id,name,score,status,library_id,type 
-    FROM paper
-    WHERE library_id = ${library_id} 
-    `
-    type !== null ? sql += `AND type = ${type} ` : sql += ''
-    status !== null ? sql += `AND status = ${status} ` : sql += ''
-    sql += `LIMIT 20 OFFSET ${offset}`
+    SELECT p.id,p.name,p.score,p.status,p.library_id,p.type 
+    FROM paper p 
+    JOIN library l ON l.id=p.library_id
+    WHERE admin_id = ${user_id} 
+    LIMIT 20 OFFSET ${offset}`
     const data = await db.query(sql, { raw: true })
     return data[0]
   }

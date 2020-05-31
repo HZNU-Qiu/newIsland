@@ -428,29 +428,20 @@ class IsLibraryExistValidator extends PositiveIntegerValidator {
 
 /**
  * 试卷查询参数校验器
- * currentPage, type, library_id, status
  */
 class QueryPaperValidator extends LinValidator {
     constructor() {
         super()
-        this.currentPage = [
-            new Rule('isInt', '当前页数必须为正整数', { min: 1 })
-        ]
-        this.type = [
-            new Rule('isInt', '试卷类型只有两种', { min: 1, max: 2 })
-        ]
-        this.library_id = [
-            new Rule('isInt', '题库编号为正整数', { min: 1 })
-        ]
-        this.status = [
-            new Rule('isInt', '试卷状态只有两种', { min: 1, max: 2 })
-        ]
     }
     async validateLibraryExistence(vals) {
-        const id = vals.body.library_id
-        const library = await Library.findByPk(id)
+        const id = vals.extra.user_id
+        const library = await Library.findOne({
+            where: {
+                admin_id: id
+            }
+        })
         if (!library) {
-            throw new Error('题库不存在')
+            throw new Error('您还未分配题库')
         }
     }
 }

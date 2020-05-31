@@ -14,13 +14,15 @@ const { success } = require('../../lib/helper')
 const { Auth } = require('../../../middlewares/auth')
 
 /**
+ * 获取题库管理员所属题库的所有试卷
  * 分页展示试卷库 一页20条记录
  */
-router.post('/', new Auth(16).m, async ctx => {
-  const v = await new QueryPaperValidator().validate(ctx)
-  const params = v.get('body')
+router.get('/all', new Auth(16).m, async ctx => {
+  const user_id = ctx.auth.uid
+  const v = await new QueryPaperValidator().validate(ctx, { user_id })
+  const { currentPage = 1 } = v.get('query')
   let data = {}
-  data.rows = await Paper.listByPage(params)
+  data.rows = await Paper.listByPage(currentPage, user_id)
   data.count = data.rows.length
   success('ok', data)
 })
