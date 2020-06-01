@@ -49,7 +49,7 @@ router.get('/judge/:id', new Auth(16).m, async ctx => {
  * 用户提交试卷
  */
 router.get('/submit/:id', new Auth(4).m, async ctx => {
-  const v = await SubmitValidator().validate(ctx)
+  const v = await new SubmitValidator().validate(ctx)
   const user_id = ctx.auth.uid
   const exam_id = v.get('path.id')
   await Record.submit(user_id, exam_id)
