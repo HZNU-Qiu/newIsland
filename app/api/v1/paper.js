@@ -7,6 +7,7 @@ const {
   PositiveIntegerValidator,
   BanPaperValidator,
   DeletePaperValidator,
+  ActivatePaperValidator,
 
 } = require('../../validators/validator')
 const { Paper } = require('../../models/paper')
@@ -81,7 +82,7 @@ router.get('/ban/:id', new Auth(16).m, async ctx => {
  * 启用试卷
  */
 router.get('/activate/:id', new Auth(16).m, async ctx => {
-  const v = await new PositiveIntegerValidator().validate(ctx)
+  const v = await new ActivatePaperValidator().validate(ctx)
   const id = v.get('path.id')
   await Paper.activate(id)
   success('ok')

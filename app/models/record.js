@@ -142,6 +142,23 @@ class Record extends Model {
     })
   }
 
+  /**
+   * 用户提交试卷结束考试
+   * @param user_id 用户id
+   * @param exam_id 考试id
+   */
+  static async submit(user_id, exam_id) {
+    const { UserExam } = require('./user_exam')
+    return await UserExam.update({
+      status: 1
+    }, {
+      where: {
+        user_id,
+        exam_id
+      }
+    })
+  }
+
 }
 
 Record.init({

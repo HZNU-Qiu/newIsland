@@ -4,7 +4,9 @@ const {
   RecordPreserveValidator,
   StartToExamValidator,
   JudgeValidator,
-  
+  SubmitValidator,
+
+
 } = require('../../validators/validator')
 const { Record } = require('../../models/record')
 const { success } = require('../../lib/helper')
@@ -27,7 +29,7 @@ router.post('/preserve', new Auth(4).m, async ctx => {
  */
 router.get('/start/:id', new Auth(4).m, async ctx => {
   const user_id = ctx.auth.uid
-  const v = await new StartToExamValidator().validate(ctx)
+  const v = await new StartToExamValidator().validate(ctx, { user_id })
   const exam_id = v.get('path.id')
   const data = await Record.show(user_id, exam_id)
   success('ok', data)
@@ -40,6 +42,17 @@ router.get('/judge/:id', new Auth(16).m, async ctx => {
   const v = await new JudgeValidator().validate(ctx)
   const exam_id = v.get('path.id')
   await Record.judge(exam_id)
+  success('ok')
+})
+
+/**
+ * 用户提交试卷
+ */
+router.get('/submit/:id', new Auth(4).m, async ctx => {
+  const v = await SubmitValidator().validate(ctx)
+  const user_id = ctx.auth.uid
+  const exam_id = v.get('path.id')
+  await Record.submit(user_id, exam_id)
   success('ok')
 })
 

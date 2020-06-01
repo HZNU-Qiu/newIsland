@@ -93,6 +93,10 @@ UserExam.init({
   grade: {
     type: Sequelize.INTEGER,
     defaultValue: 0
+  },
+  status: {
+    type: Sequelize.INTEGER,
+    defaultValue: 0
   }
 }, {
   sequelize: db,
