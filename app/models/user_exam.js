@@ -22,7 +22,7 @@ class UserExam extends Model {
   static async listUserExams(currentPage, userId) {
     const offset = (currentPage - 1) * 10
     let sql = `
-    SELECT e.id,e.name,e.start,e.end,e.status,u.grade 
+    SELECT e.id,e.name,e.start,e.end,e.status,u.grade,u.status AS hasSubmit
     FROM exam e 
     LEFT JOIN user_exam u ON e.id = u.exam_id
     WHERE u.user_id = ${userId}
