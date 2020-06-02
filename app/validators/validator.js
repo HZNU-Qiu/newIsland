@@ -495,7 +495,7 @@ class AssemblePaperValidator extends PositiveIntegerValidator {
       where: {
         paper_id: id,
         status: {
-          [Op.or]: [1,2]
+          [Op.or]: [1, 2]
         }
       }
     })
@@ -1260,6 +1260,44 @@ class SubmitValidator extends PositiveIntegerValidator {
   }
 }
 
+/**
+ * 禁用用户校验器
+ */
+class BanUserValidator extends PositiveIntegerValidator {
+  constructor() {
+    super()
+  }
+  async validateAccessToBanUser(vals) {
+    const id = vals.path.id
+    // 先校验用户是否存在或者是否已经被禁用
+    const user = await User.findOne({
+      id,
+      status: 1
+    })
+    if (!user) {
+      throw new Error('用户已被禁用或不存在')
+    }
+  }
+}
+
+class DeleteUserValidator extends PositiveIntegerValidator {
+  constructor() {
+    super()
+  }
+  async validateAccessTodelete(vals) {
+    const id = vals.path.id
+    const user = await User.findOne({
+      where: {
+        id,
+        status: 0
+      }
+    })
+    if (!user) {
+      throw new Error('用户不存在或者未被禁用,请先禁用用户')
+    }
+  }
+}
+
 module.exports = {
   PositiveIntegerValidator,
   RegisterValidator,
@@ -1308,6 +1346,7 @@ module.exports = {
   DeleteLibraryValidator,
   ActivatePaperValidator,
   SubmitValidator,
-
+  DeleteUserValidator,
+  BanUserValidator,
 
 }
