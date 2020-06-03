@@ -1280,6 +1280,9 @@ class BanUserValidator extends PositiveIntegerValidator {
   }
 }
 
+/**
+ * 删除用户校验器
+ */
 class DeleteUserValidator extends PositiveIntegerValidator {
   constructor() {
     super()
@@ -1294,6 +1297,26 @@ class DeleteUserValidator extends PositiveIntegerValidator {
     })
     if (!user) {
       throw new Error('用户不存在或者未被禁用,请先禁用用户')
+    }
+  }
+}
+
+/**
+ * 查看考试成绩列表校验器
+ */
+class CheckUserGradeValidator extends PositiveIntegerValidator {
+  constructor() {
+    super()
+  }
+  async validateAccessToCheck(vals) {
+    const exam_id = vals.path.id
+    const user_id = vals.extra.user_id
+    const library = await db.query(`SELECT l.admin_id FROM library l 
+    JOIN paper p ON p.library_id=l.id 
+    JOIN exam e ON e.paper_id=p.id
+    WHERE e.id=${exam_id}`, { raw: true })
+    if (parseInt(library[0][0].admin_id) !== user_id) {
+      throw new Error('权限不足，您不是这场考试的管理员')
     }
   }
 }
@@ -1348,5 +1371,6 @@ module.exports = {
   SubmitValidator,
   DeleteUserValidator,
   BanUserValidator,
+  CheckUserGradeValidator,
 
 }

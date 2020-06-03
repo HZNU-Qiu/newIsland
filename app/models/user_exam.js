@@ -75,6 +75,24 @@ class UserExam extends Model {
     })
   }
 
+  /**
+   * 返回某场考试所有的考试成绩给题库管理员
+   * @param exam_id 考试id
+   */
+  static async listGrade(exam_id) {
+    let sql = `
+    SELECT u.username,e.grade FROM user u 
+    LEFT JOIN user_exam e ON u.id = e.user_id
+    WHERE e.exam_id=${exam_id}
+    `
+    let grades = await db.query(sql, { raw: true })
+    grades = grades[0]
+    let data = {}
+    data.rows = grades
+    data.count = grades.length
+    return data
+  }
+
 
 }
 
