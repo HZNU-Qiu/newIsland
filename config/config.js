@@ -2,7 +2,7 @@ const judgeConfig = require('./judge_config')
 
 module.exports = {
   // 项目环境：dev|prod
-  environment: 'prod',
+  environment: 'dev',
 
   // 数据库配置
   database: {
@@ -21,5 +21,6 @@ module.exports = {
     'X-Judge-Server-Token': '9c53f96fd584d25e2f61787076590f299c082fba8a4157fb190ba0dc8cca5759',
     'Content-Type': 'application/json'
   },
-  judge_config: judgeConfig
+  judge_config: judgeConfig,
+  test_case_dir: '/root/OnlineJudgeDeploy/data/backend/test_case/' // 测试用例保存目录
 }

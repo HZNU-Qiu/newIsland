@@ -2,6 +2,7 @@ const Koa = require('koa')
 const parser = require('koa-bodyparser')
 const InitManager = require('./core/init')
 const catchError = require('./middlewares/exception')
+const cors = require('koa-cors');
 
 const app = new Koa()
 
@@ -21,6 +22,7 @@ require('./app/models/tag')
 
 app.use(catchError)
 app.use(parser())
+app.use(cors())
 
 InitManager.initCore(app)
 
