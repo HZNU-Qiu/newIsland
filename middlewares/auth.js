@@ -1,5 +1,6 @@
 const basicAuth = require('basic-auth')
 const jwt = require('jsonwebtoken')
+const user = require('../app/models/user')
 
 /**
  * 用户认证中间件
@@ -21,15 +22,15 @@ class Auth {
 			// HTTP  规定了一种身份验证机制 HttpBasicAuth
 			let msg = 'Token不合法,请重新登陆'
 			let decode
-			const userToken = basicAuth(ctx.req)
-
+			// const userToken = basicAuth(ctx.req)
+			const userToken = ctx.request.header.token
 			// 如果token不存在或者其中的name为空,抛出
-			if (!userToken || !userToken.name) {
+			if (!userToken) {
 				throw new global.errs.Forbidden(msg)
 			}
 
 			try {
-				decode = jwt.verify(userToken.name, global.config.security.secretKey)
+				decode = jwt.verify(userToken, global.config.security.secretKey)
 			} catch (error) {
 				// 令牌不合法或者令牌过期
 				if (error.name === 'TokenExpiredError') {
